@@ -262,8 +262,8 @@ function renderTasks() {
     editBtn.addEventListener('click', () => startEditTask(task.id, li, span));
 
     const delBtn = document.createElement('button');
-    delBtn.className = 'icon-btn';
-    delBtn.textContent = '🗑️';
+    delBtn.className = 'btn-delete';
+    delBtn.textContent = 'Delete';
     delBtn.title = 'Delete task';
     delBtn.setAttribute('aria-label', 'Delete task');
     delBtn.addEventListener('click', () => deleteTask(task.id));
