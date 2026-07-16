@@ -8,11 +8,22 @@
 'use strict';
 
 /* ──────────────────────────────────────────────────────────────
-   STORAGE HELPERS
+   STORAGE HELPERS  (Store — single encapsulated localStorage wrapper)
 ────────────────────────────────────────────────────────────── */
-const store = {
-  get:    (key, fallback) => { try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; } catch { return fallback; } },
-  set:    (key, val)      => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} },
+const Store = {
+  get(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v !== null ? JSON.parse(v) : fallback;
+    } catch {
+      return fallback;
+    }
+  },
+  set(key, val) {
+    try {
+      localStorage.setItem(key, JSON.stringify(val));
+    } catch { /* swallow silently */ }
+  },
 };
 
 /* ──────────────────────────────────────────────────────────────
@@ -78,7 +89,7 @@ function getGreetingText(hour, name) {
 function updateClock() {
   const now  = new Date();
   const h    = now.getHours();
-  const name = store.get('ld_name', '');
+  const name = Store.get('ld_name', '');
 
   clockEl.textContent   = `${pad(h)}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   greetingEl.textContent = getGreetingText(h, name);
@@ -94,7 +105,7 @@ updateClock();
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-  store.set('ld_theme', theme);
+  Store.set('ld_theme', theme);
 }
 
 themeToggle.addEventListener('click', () => {
@@ -103,18 +114,18 @@ themeToggle.addEventListener('click', () => {
 });
 
 // Init theme
-applyTheme(store.get('ld_theme', 'light'));
+applyTheme(Store.get('ld_theme', 'light'));
 
 /* ──────────────────────────────────────────────────────────────
    3. CUSTOM NAME
 ────────────────────────────────────────────────────────────── */
 function renderName() {
-  const name = store.get('ld_name', '');
+  const name = Store.get('ld_name', '');
   nameDisplay.textContent = name || 'Set your name';
 }
 
 editNameBtn.addEventListener('click', () => {
-  const name = store.get('ld_name', '');
+  const name = Store.get('ld_name', '');
   nameInput.value = name;
   nameWrap.classList.add('hidden');
   nameEdit.classList.remove('hidden');
@@ -123,7 +134,7 @@ editNameBtn.addEventListener('click', () => {
 
 function saveName() {
   const val = nameInput.value.trim();
-  store.set('ld_name', val);
+  Store.set('ld_name', val);
   renderName();
   nameEdit.classList.add('hidden');
   nameWrap.classList.remove('hidden');
@@ -141,7 +152,7 @@ renderName();
 const DEFAULT_MINUTES = 25;
 
 // Load saved custom duration, fall back to 25 min
-let timerDuration = store.get('ld_timer_min', DEFAULT_MINUTES) * 60; // seconds
+let timerDuration = Store.get('ld_timer_min', DEFAULT_MINUTES) * 60; // seconds
 let timerSeconds  = timerDuration;
 let timerInterval = null;
 let timerRunning  = false;
@@ -200,7 +211,7 @@ function applyCustomDuration() {
   timerRunning  = false;
   timerDuration = min * 60;
   timerSeconds  = timerDuration;
-  store.set('ld_timer_min', min);
+  Store.set('ld_timer_min', min);
   timerLabel.textContent = `Pomodoro — ${min} min`;
   renderTimer();
 }
@@ -239,9 +250,9 @@ renderTimer();
 ────────────────────────────────────────────────────────────── */
 
 // ── Data ────────────────────────────────────────────────────
-let tasks = store.get('ld_tasks', []); // [{ id, text, done }]
+let tasks = Store.get('ld_tasks', []); // [{ id, text, done }]
 
-function saveTasks() { store.set('ld_tasks', tasks); }
+function saveTasks() { Store.set('ld_tasks', tasks); }
 
 function nextId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
@@ -396,9 +407,9 @@ renderTasks();
 ────────────────────────────────────────────────────────────── */
 
 // ── Data ────────────────────────────────────────────────────
-let links = store.get('ld_links', []); // [{ id, label, url }]
+let links = Store.get('ld_links', []); // [{ id, label, url }]
 
-function saveLinks() { store.set('ld_links', links); }
+function saveLinks() { Store.set('ld_links', links); }
 
 // ── Render ──────────────────────────────────────────────────
 function renderLinks() {

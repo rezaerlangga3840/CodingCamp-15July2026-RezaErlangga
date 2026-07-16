@@ -56,10 +56,10 @@ Refactor the existing single flat `app.js` into a set of self-contained module o
     - **Validates: Requirements 1.1, 1.2**
     - Use `fc.jsonValue()` × `fc.string()` to generate arbitrary key/value pairs; assert `Store.get` after `Store.set` returns deeply equal value
 
-- [ ] 3. Checkpoint — Ensure all utility and Store tests pass
+- [-] 3. Checkpoint — Ensure all utility and Store tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Implement `ClockModule`
+- [~] 4. Implement `ClockModule`
   - Create `ClockModule` as an IIFE with private `intervalHandle` and DOM refs
   - Expose `start()` (begins 1-second `setInterval`, calls `updateClock` immediately) and `updateGreeting(name)` (re-renders only the greeting text)
   - `updateClock()` calls `formatClockTime(new Date())`, `formatDate(new Date())`, and `getGreetingText(hour, Store.get('ld_name', ''))`
@@ -106,7 +106,7 @@ Refactor the existing single flat `app.js` into a set of self-contained module o
     - Test: after Stop — Start enabled, Stop disabled
     - Test: after timer reaches zero — Start disabled, Stop disabled, Set enabled, finished class present
 
-- [ ] 8. Checkpoint — Ensure all tests pass for Clock, Theme, Name, Timer modules
+- [~] 8. Checkpoint — Ensure all tests pass for Clock, Theme, Name, Timer modules
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Extract task pure helpers into `js/utils.js`
@@ -203,7 +203,7 @@ Refactor the existing single flat `app.js` into a set of self-contained module o
     - Test: `#taskError` has `role="alert"`
     - Test: `#sortSelect` has an associated `<label>` element
 
-- [ ] 14. Final checkpoint — Ensure all tests pass
+- [~] 14. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
   - Manually verify in a browser: clock ticks, theme persists on reload, name persists on reload, timer counts down and shows "Time's up", task CRUD with sort, link chips open correct URLs, layout collapses on mobile viewport.
 
