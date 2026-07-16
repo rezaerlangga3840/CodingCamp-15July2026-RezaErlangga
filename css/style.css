@@ -103,21 +103,42 @@ body {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 16px 48px;
+  min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto 1fr 1fr;
+  grid-template-areas:
+    "greeting greeting"
+    "timer    todo"
+    "links    todo";
   gap: 20px;
+  align-items: stretch;
 }
 
 /* Greeting spans full width on top */
 .widget--greeting {
-  grid-column: 1 / -1;
+  grid-area: greeting;
+  text-align: center;
 }
 
-/* Todo list spans full width on bottom */
-.widget--todo {
-  grid-column: 1 / -1;
+/* Timer — top-left */
+.widget--timer {
+  grid-area: timer;
 }
+
+/* To-Do list — right column, spans both rows */
+.widget--todo {
+  grid-area: todo;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+/* Quick Links — bottom-left */
+.widget--links {
+  grid-area: links;
+}
+
 
 /* ============================================================
    Widget Card Base
@@ -167,6 +188,7 @@ body {
 .greeting__name-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
 }
@@ -381,6 +403,29 @@ body {
   flex-direction: column;
   gap: 6px;
   margin-top: 10px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+/* Webkit scrollbar styling (Chrome, Edge, Safari) */
+.todo__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.todo__list::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 3px;
+}
+
+.todo__list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
 }
 
 /* Individual task item */
@@ -566,16 +611,23 @@ body.dark .ls-warning {
 @media (max-width: 640px) {
   .dashboard {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "greeting"
+      "timer"
+      "todo"
+      "links";
     padding: 16px 12px 48px;
     gap: 14px;
   }
 
-  .widget--greeting {
-    grid-column: 1;
+  .widget--todo {
+    height: auto;
   }
 
-  .widget--todo {
-    grid-column: 1;
+  .todo__list {
+    overflow-y: visible;
+    flex: none;
   }
 
   .timer__controls {

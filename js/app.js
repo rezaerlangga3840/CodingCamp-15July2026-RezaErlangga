@@ -16,6 +16,7 @@
     tasks: 'tasks',
     quickLinks: 'quickLinks',
     theme: 'theme',
+    timerDuration: 'timerDuration',
   };
 
   let _lsAvailable = true;
@@ -278,6 +279,13 @@
     },
 
     init() {
+      // Restore saved duration from localStorage
+      const savedMinutes = parseInt(_lsGet(LS_KEYS.timerDuration), 10);
+      if (!isNaN(savedMinutes) && savedMinutes >= 1 && savedMinutes <= 99) {
+        TimerModule.state.durationSeconds = savedMinutes * 60;
+        TimerModule.state.remaining = savedMinutes * 60;
+      }
+
       TimerModule._updateDisplay();
       TimerModule._setButtonStates();
 
@@ -285,6 +293,11 @@
       const stopBtn = document.getElementById('timer-stop');
       const resetBtn = document.getElementById('timer-reset');
       const durationInput = document.getElementById('timer-duration');
+
+      // Seed the input with the restored value
+      if (durationInput) {
+        durationInput.value = Math.floor(TimerModule.state.durationSeconds / 60);
+      }
 
       if (startBtn) startBtn.addEventListener('click', () => TimerModule.startTimer());
       if (stopBtn) stopBtn.addEventListener('click', () => TimerModule.stopTimer());
@@ -295,6 +308,7 @@
           const val = parseInt(durationInput.value, 10);
           if (!isNaN(val) && val >= 1 && val <= 99) {
             TimerModule.state.durationSeconds = val * 60;
+            _lsSet(LS_KEYS.timerDuration, val);
             TimerModule.resetTimer();
           } else {
             // Restore to sane value
