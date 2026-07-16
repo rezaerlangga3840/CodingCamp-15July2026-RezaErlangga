@@ -1,116 +1,128 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Life Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="light">
 
-  <div class="page-wrapper">
+  <!-- ========== THEME TOGGLE ========== -->
+  <button id="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+    <span id="theme-icon">🌙</span>
+  </button>
 
-    <!-- ═══════════════════════════════════════
-         HEADER CARD — Clock · Date · Greeting
-    ════════════════════════════════════════ -->
-    <header class="card header-card">
+  <div class="dashboard">
 
-      <!-- Top-right controls (name + theme) -->
-      <div class="header-controls">
-        <div class="name-wrap" id="nameWrap">
-          <span class="name-display" id="nameDisplay">Set your name</span>
-          <button class="icon-btn" id="editNameBtn" title="Edit name" aria-label="Edit name">✏️</button>
-        </div>
-        <div class="name-edit hidden" id="nameEdit">
-          <input type="text" id="nameInput" placeholder="Your name…" maxlength="32" />
-          <button class="btn btn-sm btn-primary" id="saveNameBtn">Save</button>
-        </div>
-        <button class="toggle-theme" id="themeToggle" aria-label="Toggle dark mode">
-          <span id="themeIcon">🌙</span>
-        </button>
+    <!-- ========== GREETING WIDGET ========== -->
+    <section class="widget widget--greeting" id="greeting">
+      <div class="greeting__time" id="greeting-time">00:00:00</div>
+      <div class="greeting__date" id="greeting-date">Loading…</div>
+      <div class="greeting__message" id="greeting-message">Hello!</div>
+      <div class="greeting__name-row">
+        <span class="greeting__name-label">Your name:</span>
+        <input
+          type="text"
+          id="name-input"
+          class="greeting__name-input"
+          maxlength="40"
+          placeholder="Enter your name"
+          aria-label="Your display name"
+        />
+        <button id="name-save" class="btn btn--small" aria-label="Save name">Save</button>
+      </div>
+    </section>
+
+    <!-- ========== POMODORO TIMER ========== -->
+    <section class="widget widget--timer" id="timer">
+      <h2 class="widget__title">Focus Timer</h2>
+      <div class="timer__display" id="timer-display" aria-live="polite">25:00</div>
+      <div class="timer__config">
+        <label for="timer-duration" class="timer__label">Duration (min):</label>
+        <input
+          type="number"
+          id="timer-duration"
+          class="timer__input"
+          min="1"
+          max="99"
+          value="25"
+          aria-label="Timer duration in minutes"
+        />
+      </div>
+      <div class="timer__controls">
+        <button id="timer-start" class="btn btn--primary" aria-label="Start timer">Start</button>
+        <button id="timer-stop" class="btn" aria-label="Stop timer" disabled>Stop</button>
+        <button id="timer-reset" class="btn" aria-label="Reset timer">Reset</button>
+      </div>
+    </section>
+
+    <!-- ========== TO-DO LIST ========== -->
+    <section class="widget widget--todo" id="todo">
+      <h2 class="widget__title">To-Do List</h2>
+
+      <form id="todo-form" class="todo__form" novalidate>
+        <input
+          type="text"
+          id="todo-input"
+          class="todo__input"
+          placeholder="Add a new task…"
+          maxlength="200"
+          aria-label="New task description"
+          autocomplete="off"
+        />
+        <button type="submit" class="btn btn--primary" aria-label="Add task">Add</button>
+      </form>
+      <div id="todo-error" class="error-msg" role="alert" aria-live="polite"></div>
+
+      <div class="todo__controls">
+        <label for="sort-select" class="todo__sort-label">Sort:</label>
+        <select id="sort-select" class="todo__sort" aria-label="Sort tasks">
+          <option value="none">Default</option>
+          <option value="status">By Status</option>
+          <option value="alpha">Alphabetical</option>
+        </select>
       </div>
 
-      <!-- Centered clock / date / greeting -->
-      <div class="header-body">
-        <p class="clock" id="clock">00:00:00</p>
-        <p class="date"  id="date">Wednesday, 15 July 2026</p>
-        <p class="greeting" id="greeting">Good Morning</p>
-      </div>
+      <ul id="todo-list" class="todo__list" aria-label="Task list"></ul>
+    </section>
 
-    </header>
+    <!-- ========== QUICK LINKS ========== -->
+    <section class="widget widget--links" id="quicklinks">
+      <h2 class="widget__title">Quick Links</h2>
 
-    <!-- ═══════════════════════════════════════
-         MAIN GRID  (timer | tasks)
-    ════════════════════════════════════════ -->
-    <main class="dashboard-grid">
+      <form id="links-form" class="links__form" novalidate>
+        <input
+          type="text"
+          id="link-label"
+          class="links__input"
+          placeholder="Label"
+          maxlength="40"
+          aria-label="Link label"
+          autocomplete="off"
+        />
+        <input
+          type="url"
+          id="link-url"
+          class="links__input"
+          placeholder="https://example.com"
+          aria-label="Link URL"
+          autocomplete="off"
+        />
+        <button type="submit" class="btn btn--primary" aria-label="Add link">Add</button>
+      </form>
+      <div id="links-error" class="error-msg" role="alert" aria-live="polite"></div>
 
-      <!-- ── Focus Timer ─────────────────── -->
-      <section class="card timer-card" aria-label="Focus Timer">
-        <h2 class="card-title">Focus Timer</h2>
-        <div class="timer-display" id="timerDisplay">25:00</div>
-        <div class="timer-controls">
-          <button class="btn btn-primary" id="timerStart">Start</button>
-          <button class="btn btn-primary" id="timerStop">Stop</button>
-          <button class="btn btn-primary" id="timerReset">Reset</button>
-        </div>
-        <p class="timer-label" id="timerLabel">Pomodoro — 25 min</p>
-        <div class="timer-set-row">
-          <label for="timerMinInput" class="timer-set-label">Set minutes:</label>
-          <input type="number" id="timerMinInput" class="timer-min-input" min="1" max="120" value="25" aria-label="Set timer minutes" />
-          <button class="btn btn-sm btn-primary" id="timerSetBtn">Set</button>
-        </div>
-      </section>
+      <div id="links-container" class="links__container" aria-label="Quick links"></div>
+    </section>
 
-      <!-- ── Tasks ───────────────────────── -->
-      <section class="card todo-card" aria-label="Tasks">
-        <div class="card-header-row">
-          <h2 class="card-title">Tasks</h2>
-          <div class="sort-wrap">
-            <label for="sortSelect" class="sr-only">Sort tasks</label>
-            <select id="sortSelect" class="sort-select" title="Sort tasks">
-              <option value="default">Default</option>
-              <option value="az">A → Z</option>
-              <option value="za">Z → A</option>
-              <option value="done">Done last</option>
-              <option value="undone">Done first</option>
-            </select>
-          </div>
-        </div>
+  </div><!-- /dashboard -->
 
-        <div class="todo-input-row">
-          <input
-            type="text"
-            id="taskInput"
-            placeholder="Add a new task..."
-            maxlength="120"
-            aria-label="New task"
-          />
-          <button class="btn btn-primary" id="addTaskBtn">Add</button>
-        </div>
-        <p class="task-error hidden" id="taskError" role="alert"></p>
-
-        <ul class="task-list" id="taskList" aria-label="Task list"></ul>
-        <p class="empty-hint" id="emptyHint">No tasks yet. Add one above!</p>
-      </section>
-
-      <!-- ── Quick Links ─────────────────── -->
-      <section class="card links-card" aria-label="Quick Links">
-        <h2 class="card-title">Quick Links</h2>
-
-        <div class="link-input-row">
-          <input type="text" id="linkLabel" placeholder="Link name" maxlength="32" aria-label="Link label" />
-          <input type="url"  id="linkUrl"   placeholder="URL" aria-label="Link URL" />
-          <button class="btn btn-primary" id="addLinkBtn">Add Link</button>
-        </div>
-
-        <div class="links-grid" id="linksGrid"></div>
-        <p class="empty-hint" id="emptyLinksHint">No links yet. Add your favorites!</p>
-      </section>
-
-    </main>
+  <!-- LocalStorage unavailability warning (hidden by default) -->
+  <div id="ls-warning" class="ls-warning" role="alert" style="display:none;">
+    ⚠️ Local Storage is unavailable. Data will not be saved between sessions.
   </div>
 
-  <script src="js/utils.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
