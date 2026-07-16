@@ -54,6 +54,11 @@
           <button class="btn btn-primary" id="timerReset">Reset</button>
         </div>
         <p class="timer-label" id="timerLabel">Pomodoro — 25 min</p>
+        <div class="timer-set-row">
+          <label for="timerMinInput" class="timer-set-label">Set minutes:</label>
+          <input type="number" id="timerMinInput" class="timer-min-input" min="1" max="120" value="25" aria-label="Set timer minutes" />
+          <button class="btn btn-sm btn-primary" id="timerSetBtn">Set</button>
+        </div>
       </section>
 
       <!-- ── Tasks ───────────────────────── -->
@@ -82,6 +87,7 @@
           />
           <button class="btn btn-primary" id="addTaskBtn">Add</button>
         </div>
+        <p class="task-error hidden" id="taskError" role="alert"></p>
 
         <ul class="task-list" id="taskList" aria-label="Task list"></ul>
         <p class="empty-hint" id="emptyHint">No tasks yet. Add one above!</p>

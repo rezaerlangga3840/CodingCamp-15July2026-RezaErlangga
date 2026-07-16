@@ -39,6 +39,8 @@ const timerStart   = $('timerStart');
 const timerStop    = $('timerStop');
 const timerReset   = $('timerReset');
 const timerLabel   = $('timerLabel');
+const timerMinInput = $('timerMinInput');
+const timerSetBtn   = $('timerSetBtn');
 
 // Todo
 const taskInput    = $('taskInput');
@@ -46,6 +48,7 @@ const addTaskBtn   = $('addTaskBtn');
 const taskList     = $('taskList');
 const emptyHint    = $('emptyHint');
 const sortSelect   = $('sortSelect');
+const taskError    = $('taskError');
 
 // Links
 const linkLabel      = $('linkLabel');
@@ -135,11 +138,16 @@ renderName();
 /* ──────────────────────────────────────────────────────────────
    4. FOCUS TIMER
 ────────────────────────────────────────────────────────────── */
-const TIMER_DURATION = 25 * 60; // seconds
+const DEFAULT_MINUTES = 25;
 
-let timerSeconds   = TIMER_DURATION;
-let timerInterval  = null;
-let timerRunning   = false;
+// Load saved custom duration, fall back to 25 min
+let timerDuration = store.get('ld_timer_min', DEFAULT_MINUTES) * 60; // seconds
+let timerSeconds  = timerDuration;
+let timerInterval = null;
+let timerRunning  = false;
+
+// Sync the number input to whatever is saved
+timerMinInput.value = timerDuration / 60;
 
 function formatTime(s) { return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`; }
 
@@ -149,17 +157,23 @@ function renderTimer() {
   if (timerRunning) {
     timerDisplay.classList.add('running');
     timerDisplay.classList.remove('finished');
-    timerStart.disabled = true;
-    timerStop.disabled  = false;
+    timerStart.disabled    = true;
+    timerStop.disabled     = false;
+    timerSetBtn.disabled   = true;
+    timerMinInput.disabled = true;
   } else if (timerSeconds === 0) {
     timerDisplay.classList.add('finished');
     timerDisplay.classList.remove('running');
-    timerStart.disabled = true;
-    timerStop.disabled  = true;
+    timerStart.disabled    = true;
+    timerStop.disabled     = true;
+    timerSetBtn.disabled   = false;
+    timerMinInput.disabled = false;
   } else {
     timerDisplay.classList.remove('running', 'finished');
-    timerStart.disabled = false;
-    timerStop.disabled  = true;
+    timerStart.disabled    = false;
+    timerStop.disabled     = true;
+    timerSetBtn.disabled   = false;
+    timerMinInput.disabled = false;
   }
 }
 
@@ -173,6 +187,21 @@ function tickTimer() {
     return;
   }
   timerSeconds--;
+  renderTimer();
+}
+
+function applyCustomDuration() {
+  const raw = parseInt(timerMinInput.value, 10);
+  const min = Math.max(1, Math.min(120, isNaN(raw) ? DEFAULT_MINUTES : raw));
+  timerMinInput.value = min; // clamp visual value too
+
+  // Stop any running timer first
+  clearInterval(timerInterval);
+  timerRunning  = false;
+  timerDuration = min * 60;
+  timerSeconds  = timerDuration;
+  store.set('ld_timer_min', min);
+  timerLabel.textContent = `Pomodoro — ${min} min`;
   renderTimer();
 }
 
@@ -194,10 +223,14 @@ timerStop.addEventListener('click', () => {
 timerReset.addEventListener('click', () => {
   clearInterval(timerInterval);
   timerRunning  = false;
-  timerSeconds  = TIMER_DURATION;
-  timerLabel.textContent = 'Pomodoro — 25 min';
+  timerSeconds  = timerDuration;
+  const min = timerDuration / 60;
+  timerLabel.textContent = `Pomodoro — ${min} min`;
   renderTimer();
 });
+
+timerSetBtn.addEventListener('click', applyCustomDuration);
+timerMinInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyCustomDuration(); });
 
 renderTimer();
 
@@ -275,9 +308,32 @@ function renderTasks() {
 }
 
 // ── Actions ─────────────────────────────────────────────────
+function showTaskError(msg) {
+  taskError.textContent = msg;
+  taskError.classList.remove('hidden');
+  // auto-hide after 3 s
+  clearTimeout(showTaskError._timer);
+  showTaskError._timer = setTimeout(() => taskError.classList.add('hidden'), 3000);
+}
+
+function clearTaskError() {
+  taskError.classList.add('hidden');
+  taskError.textContent = '';
+}
+
 function addTask() {
   const text = taskInput.value.trim();
   if (!text) { taskInput.focus(); return; }
+
+  // Duplicate check — case-insensitive
+  const isDuplicate = tasks.some(t => t.text.toLowerCase() === text.toLowerCase());
+  if (isDuplicate) {
+    showTaskError(`"${text}" is already in your list.`);
+    taskInput.select();
+    return;
+  }
+
+  clearTaskError();
   tasks.push({ id: nextId(), text, done: false });
   saveTasks();
   renderTasks();
@@ -330,6 +386,7 @@ function startEditTask(id, li, span) {
 // ── Event Listeners ─────────────────────────────────────────
 addTaskBtn.addEventListener('click', addTask);
 taskInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+taskInput.addEventListener('input', clearTaskError);
 sortSelect.addEventListener('change', renderTasks);
 
 renderTasks();
