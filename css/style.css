@@ -106,7 +106,7 @@ body {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr 1fr;
+  grid-template-rows: auto minmax(220px, auto) minmax(160px, auto);
   grid-template-areas:
     "greeting greeting"
     "timer    todo"
@@ -131,7 +131,10 @@ body {
   grid-area: todo;
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  /* grid stretch fills this to timer-row-height + gap + links-row-height */
+  align-self: stretch;
+  /* tell the flex child (.todo__list) it can shrink into this fixed container */
+  overflow: hidden;
 }
 
 /* Quick Links — bottom-left */
@@ -403,9 +406,10 @@ body {
   flex-direction: column;
   gap: 6px;
   margin-top: 10px;
+  /* fills remaining height inside the widget; scrollbar appears when items overflow */
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
 }
@@ -623,6 +627,7 @@ body.dark .ls-warning {
 
   .widget--todo {
     height: auto;
+    overflow: visible;
   }
 
   .todo__list {

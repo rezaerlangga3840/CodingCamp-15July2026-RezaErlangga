@@ -94,10 +94,11 @@
   ================================================================ */
   const GreetingModule = {
     /**
-     * Returns "Good Morning/Afternoon/Evening, {name}!"
+     * Returns "Good Morning/Afternoon/Evening/Night, {name}!"
      * Morning:   05:00 – 11:59
      * Afternoon: 12:00 – 17:59
-     * Evening:   18:00 – 04:59
+     * Evening:   18:00 – 19:59
+     * Night:     20:00 – 04:59
      * @param {number} hour  0–23
      * @param {string} name
      * @returns {string}
@@ -108,8 +109,10 @@
         period = 'Good Morning';
       } else if (hour >= 12 && hour <= 17) {
         period = 'Good Afternoon';
-      } else {
+      } else if (hour >= 18 && hour <= 19) {
         period = 'Good Evening';
+      } else {
+        period = 'Good Night';
       }
       return `${period}, ${name}!`;
     },
